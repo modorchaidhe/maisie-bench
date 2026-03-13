@@ -44,7 +44,7 @@ namespace TeddyBench
 
         private static object TonieInfoLock = new object();
         private static TonieTools.TonieData[] TonieInfo = new TonieTools.TonieData[0];
-        private static Dictionary<string, string> TonieInfoCustom = new Dictionary<string, string>();
+        private static Dictionary<string, TonieTools.CustomTonieData> TonieInfoCustom = new Dictionary<string, TonieTools.CustomTonieData>();
         private static string TonieInfoString = "";
 
         private Dictionary<string, Tuple<TonieAudio, DateTime>> CachedAudios = new Dictionary<string, Tuple<TonieAudio, DateTime>>();
@@ -222,7 +222,7 @@ namespace TeddyBench
 
                     try
                     {
-                        TonieInfoCustom = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("customTonies.json"));
+                        TonieInfoCustom = JsonConvert.DeserializeObject<Dictionary<string, TonieTools.CustomTonieData>>(File.ReadAllText("customTonies.json"));
                     }
                     catch (FileNotFoundException e)
                     {
@@ -989,12 +989,16 @@ namespace TeddyBench
                                         if (TonieInfoCustom.ContainsKey(hash))
                                         {
                                             LogWindow.Log(LogWindow.eLogLevel.DebugVerbose, "     known tonie, overriding name");
-                                            tonieName = TonieInfoCustom[hash];
+                                            tonieName = TonieInfoCustom[hash].Name;
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(info.Pic) && !tonieDisplayList.LargeImageList.Images.ContainsKey(hash))
                                     {
                                         Image img = GetImage(info.Pic, hash);
+                                        if(img == null && TonieInfoCustom.ContainsKey(hash))
+                                        {
+                                            img = GetImage(TonieInfoCustom[hash].imgPath, hash);
+                                        }
                                         if (img != null)
                                         {
                                             this.BeginInvoke(new Action(() =>
@@ -1016,9 +1020,9 @@ namespace TeddyBench
                                         if (TonieInfoCustom.ContainsKey(hash))
                                         {
                                             LogWindow.Log(LogWindow.eLogLevel.DebugVerbose, "     known custom tonie");
-                                            tonieName = TonieInfoCustom[hash];
+                                            tonieName = TonieInfoCustom[hash].Name;
                                             tag.Info.Title = tonieName;
-                                            image = "custom";
+                                            image = TonieInfoCustom[hash].imgPath;
                                             update = true;
                                         }
                                         else if (dumpFile.Header.AudioId < 0x50000000)
@@ -1101,12 +1105,36 @@ namespace TeddyBench
             {
             }
 
-            try
+            Image img = null;
+            // if it is a web link
+            if(pic.Contains("https://") || pic.Contains("http://"))
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(pic);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Image img = ResizeImage(Image.FromStream(response.GetResponseStream()), 128, 128);
+                try
+                {
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(pic);
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    img = ResizeImage(Image.FromStream(response.GetResponseStream()), 128, 128);
+                }
+                catch (Exception ex)
+                {
+                    // MAISIE_ERROR_TODO error handling
+                }
+            }
+            // if it is a file path
+            else if(File.Exists(pic))
+            {
+                try
+                {
+                    img = Image.FromFile(pic);
+                }
+                catch (Exception ex)
+                {
+                    // MAISIE_ERROR_TODO error handling
+                }
+            }
 
+            if(img != null)
+            {
                 try
                 {
                     img.Save(cacheFileName);
@@ -1114,13 +1142,9 @@ namespace TeddyBench
                 catch (Exception ex)
                 {
                 }
-                return img;
-            }
-            catch (Exception ex)
-            {
             }
 
-            return null;
+            return img;
         }
 
         private void SetImage(string path)
@@ -1559,9 +1583,10 @@ namespace TeddyBench
             {
                 if (!TonieInfoCustom.ContainsKey(tag.Hash))
                 {
-                    TonieInfoCustom.Add(tag.Hash, "");
+                    TonieInfoCustom.Add(tag.Hash, new TonieTools.CustomTonieData());
                 }
-                TonieInfoCustom[tag.Hash] = e.Label;
+                TonieInfoCustom[tag.Hash].Name = e.Label;
+                TonieInfoCustom[tag.Hash].imgPath = "";
             }
 
             SaveJson();
@@ -2117,7 +2142,7 @@ namespace TeddyBench
                 string customName = null;
                 if (TonieInfoCustom.ContainsKey(tag.Hash))
                 {
-                    customName = TonieInfoCustom[tag.Hash];
+                    customName = TonieInfoCustom[tag.Hash].Name;
                 }
                 TonieTools.DumpInfo(str, TonieTools.eDumpFormat.FormatText, tag.FileName, TonieInfo, customName);
             }

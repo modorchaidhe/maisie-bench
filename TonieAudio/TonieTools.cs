@@ -79,6 +79,14 @@ namespace TonieFile
             public string Pic;
         }
 
+        public class CustomTonieData
+        {
+            [JsonProperty("name")]
+            public string Name;
+            [JsonProperty("img_path")]
+            public string imgPath;
+        }
+
         public static bool DumpInfo(StringBuilder message, eDumpFormat dumpFormat, string file, TonieData[] tonieInfos, string customName = null)
         {
             try
