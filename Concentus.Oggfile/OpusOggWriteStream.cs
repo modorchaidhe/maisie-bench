@@ -72,6 +72,7 @@ namespace Concentus.Oggfile
         /// sample rates to line up properly in this case, set the encoder to 48000 and pass inputSampleRate = 44100,
         /// and the write stream will perform resampling for you automatically (Note that resampling will slow down
         /// the encoding).</param>
+        /// <param name="logicalStreamId"> A randomly generated number, divergence from original package. Set to 0 to match standard Concentus.Oggfile behaviour.</param>
         public OpusOggWriteStream(OpusEncoder encoder, Stream outputStream, OpusTags fileTags = null, int inputSampleRate = 0, int logicalStreamId = 0)
         {
             _encoder = encoder;
