@@ -593,7 +593,7 @@ namespace TeddyBench
         }
 
 
-        // MAISIE_TODO: What in the world is an Audio ID?
+        // MAISIE_TODO: Do we still need the Audio ID system?
         private uint GetAudioID()
         {
             if(MessageBox.Show("Do you want to set a specific Audio-ID? If you don't know, just say 'No'.", "Set specific Audio ID", MessageBoxButtons.YesNo) == DialogResult.No)
@@ -684,10 +684,13 @@ namespace TeddyBench
 
                     foreach (var drive in drives)
                     {
+                        // an SD card will be removable
                         if (drive.DriveType == DriveType.Removable)
                         {
                             try
                             {
+                                // contains a CONTENT drive
+                                // MAISIE_TODO is this sufficiently rigourous?
                                 if (drive.IsReady && drive.RootDirectory.GetDirectories().Where(d => d.Name == "CONTENT").Count() == 1)
                                 {
                                     NotifyDrive(drive);
@@ -695,6 +698,7 @@ namespace TeddyBench
                             }
                             catch (Exception ex)
                             {
+                                // MAISIE_ERROR_TODO error handling
                             }
                         }
                     }
@@ -713,6 +717,7 @@ namespace TeddyBench
                         catch (Exception ex)
                         {
                             failedRead = true;
+                            // MAISIE_ERROR_TODO error handling
                         }
 
                         if (failedRead)
@@ -720,9 +725,14 @@ namespace TeddyBench
                             NotifyDriveLost();
                         }
                     }
+                    else
+                    {
+                        ShowNoDirectoryMessage();
+                    }
                 }
                 catch (Exception ex)
                 {
+                    // MAISIE_ERROR_TODO error handling
                 }
 
                 Thread.Sleep(500);
@@ -736,12 +746,28 @@ namespace TeddyBench
                 this.BeginInvoke(new Action(() => { NotifyDriveLost(); }));
                 return;
             }
-            grpCardContent.Visible = false;
-            lblMessage.Visible = true;
+            
             CurrentDirectory = null;
+            ShowNoDirectoryMessage();
             AutoOpenDrive = true;
             Text = TitleString;
             StopAnalyzeThread();
+        }
+
+        private void ShowNoDirectoryMessage()
+        {
+            grpCardContent.Visible = false;
+            lblMessage.Visible = true;
+            LoadLocalDirectoryButton.Enabled = true;
+            LoadLocalDirectoryButton.Visible = true;
+        }
+
+        private void HideNoDirectoryMessage()
+        {
+            grpCardContent.Visible = true;
+            lblMessage.Visible = false;
+            LoadLocalDirectoryButton.Enabled = false;
+            LoadLocalDirectoryButton.Visible = false;
         }
 
         private void NotifyDrive(DriveInfo drive)
@@ -768,6 +794,16 @@ namespace TeddyBench
         }
 
         private void openDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadLocalDirectoryViaDialog();
+        }
+
+        private void LoadLocalDirectoryButton_Click(object sender, EventArgs e)
+        {
+            LoadLocalDirectoryViaDialog();
+        }
+
+        private void LoadLocalDirectoryViaDialog()
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
 
@@ -822,8 +858,7 @@ namespace TeddyBench
                 btnSave.Enabled = true;
 
                 txtLog.Visible = false;
-                grpCardContent.Visible = true;
-                lblMessage.Visible = false;
+                HideNoDirectoryMessage();
                 tonieDisplayList.Items.Clear();
                 RegisteredItems.Clear();
 
@@ -2497,6 +2532,12 @@ namespace TeddyBench
         {
             Settings.PromptForAudioID = promptForAudioIDOnAddToolStripMenuItem.Checked;
             SaveSettings();
+        }
+
+        private void tonieDisplayList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+
         }
     }
 }

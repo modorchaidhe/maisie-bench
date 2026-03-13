@@ -25,6 +25,8 @@
         /// <summary>
         /// Erforderliche Methode für die Designerunterstützung.
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
+        /// [Google translated: DE-EN] Required method for designer support.
+        /// The contents of this method must not be modified using the code editor.
         /// </summary>
         private void InitializeComponent()
         {
@@ -52,6 +54,7 @@
             this.downloadToniesjsonOnStartupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadToniesjsonNowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.enableDebugModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.promptForAudioIDOnAddToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -67,6 +70,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.btnPlay = new System.Windows.Forms.Button();
             this.cmbSorting = new System.Windows.Forms.ComboBox();
+            this.LoadLocalDirectoryButton = new System.Windows.Forms.Button();
             this.tonieDisplayList = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnSave = new System.Windows.Forms.Button();
@@ -86,7 +90,6 @@
             this.exportTooggToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendDiagnosticsReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.promptForAudioIDOnAddToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.grpCardContent.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -112,7 +115,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1067, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1193, 30);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -128,14 +131,15 @@
             // openDirectoryToolStripMenuItem
             // 
             this.openDirectoryToolStripMenuItem.Name = "openDirectoryToolStripMenuItem";
-            this.openDirectoryToolStripMenuItem.Size = new System.Drawing.Size(193, 26);
-            this.openDirectoryToolStripMenuItem.Text = "&Open Directory";
+            this.openDirectoryToolStripMenuItem.Size = new System.Drawing.Size(229, 26);
+            this.openDirectoryToolStripMenuItem.Text = "&Load Local Directory";
+            this.openDirectoryToolStripMenuItem.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
             this.openDirectoryToolStripMenuItem.Click += new System.EventHandler(this.openDirectoryToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(193, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(229, 26);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -252,6 +256,14 @@
             this.enableDebugModeToolStripMenuItem.Text = "Show debug window";
             this.enableDebugModeToolStripMenuItem.Click += new System.EventHandler(this.enableDebugModeToolStripMenuItem_Click);
             // 
+            // promptForAudioIDOnAddToolStripMenuItem
+            // 
+            this.promptForAudioIDOnAddToolStripMenuItem.CheckOnClick = true;
+            this.promptForAudioIDOnAddToolStripMenuItem.Name = "promptForAudioIDOnAddToolStripMenuItem";
+            this.promptForAudioIDOnAddToolStripMenuItem.Size = new System.Drawing.Size(306, 26);
+            this.promptForAudioIDOnAddToolStripMenuItem.Text = "Prompt For AudioID on Add";
+            this.promptForAudioIDOnAddToolStripMenuItem.Click += new System.EventHandler(this.promptForAudioIDOnAddToolStripMenuItem_Click);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -315,7 +327,7 @@
             this.grpCardContent.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.grpCardContent.Name = "grpCardContent";
             this.grpCardContent.Padding = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.grpCardContent.Size = new System.Drawing.Size(1067, 524);
+            this.grpCardContent.Size = new System.Drawing.Size(1193, 524);
             this.grpCardContent.TabIndex = 1;
             this.grpCardContent.TabStop = false;
             this.grpCardContent.Text = "Card Content";
@@ -339,8 +351,8 @@
             this.splitContainer1.Panel2.Controls.Add(this.btnSave);
             this.splitContainer1.Panel2.Controls.Add(this.btnDelete);
             this.splitContainer1.Panel2.Controls.Add(this.btnAdd);
-            this.splitContainer1.Size = new System.Drawing.Size(1051, 495);
-            this.splitContainer1.SplitterDistance = 965;
+            this.splitContainer1.Size = new System.Drawing.Size(1177, 495);
+            this.splitContainer1.SplitterDistance = 1097;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -365,7 +377,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.tonieDisplayList);
-            this.splitContainer2.Size = new System.Drawing.Size(965, 495);
+            this.splitContainer2.Size = new System.Drawing.Size(1097, 495);
             this.splitContainer2.SplitterDistance = 36;
             this.splitContainer2.SplitterWidth = 1;
             this.splitContainer2.TabIndex = 1;
@@ -428,6 +440,17 @@
             this.cmbSorting.TabIndex = 0;
             this.cmbSorting.SelectedIndexChanged += new System.EventHandler(this.cmbSorting_SelectedIndexChanged);
             // 
+            // LoadLocalDirectoryButton
+            // 
+            this.LoadLocalDirectoryButton.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.LoadLocalDirectoryButton.Location = new System.Drawing.Point(388, 272);
+            this.LoadLocalDirectoryButton.Name = "LoadLocalDirectoryButton";
+            this.LoadLocalDirectoryButton.Size = new System.Drawing.Size(201, 36);
+            this.LoadLocalDirectoryButton.TabIndex = 1;
+            this.LoadLocalDirectoryButton.Text = "Load Local Directory";
+            this.LoadLocalDirectoryButton.UseVisualStyleBackColor = false;
+            this.LoadLocalDirectoryButton.Click += new System.EventHandler(this.LoadLocalDirectoryButton_Click);
+            // 
             // tonieDisplayList
             // 
             this.tonieDisplayList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -453,12 +476,13 @@
             this.tonieDisplayList.Margin = new System.Windows.Forms.Padding(4);
             this.tonieDisplayList.Name = "tonieDisplayList";
             this.tonieDisplayList.ShowItemToolTips = true;
-            this.tonieDisplayList.Size = new System.Drawing.Size(965, 458);
+            this.tonieDisplayList.Size = new System.Drawing.Size(1097, 458);
             this.tonieDisplayList.TabIndex = 0;
             this.tonieDisplayList.TileSize = new System.Drawing.Size(64, 64);
             this.tonieDisplayList.UseCompatibleStateImageBehavior = false;
             this.tonieDisplayList.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.lstTonies_AfterLabelEdit);
             this.tonieDisplayList.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.lstTonies_ItemSelectionChanged);
+            this.tonieDisplayList.SelectedIndexChanged += new System.EventHandler(this.tonieDisplayList_SelectedIndexChanged);
             this.tonieDisplayList.DoubleClick += new System.EventHandler(this.lstTonies_DoubleClick);
             this.tonieDisplayList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstTonies_KeyDown);
             this.tonieDisplayList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lstTonies_MouseClick);
@@ -502,7 +526,6 @@
             // 
             // lblMessage
             // 
-            this.lblMessage.AutoSize = true;
             this.lblMessage.Location = new System.Drawing.Point(364, 209);
             this.lblMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMessage.Name = "lblMessage";
@@ -516,10 +539,10 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 530);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 528);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(1067, 23);
+            this.statusStrip1.Size = new System.Drawing.Size(1193, 26);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             this.statusStrip1.Visible = false;
@@ -527,7 +550,7 @@
             // statusLabel
             // 
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(29, 17);
+            this.statusLabel.Size = new System.Drawing.Size(29, 20);
             this.statusLabel.Text = "<>";
             // 
             // txtLog
@@ -540,7 +563,7 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtLog.Size = new System.Drawing.Size(1067, 524);
+            this.txtLog.Size = new System.Drawing.Size(1193, 524);
             this.txtLog.TabIndex = 1;
             this.txtLog.Visible = false;
             // 
@@ -621,20 +644,13 @@
             this.sendDiagnosticsReportToolStripMenuItem.Text = "Send diagnostics report";
             this.sendDiagnosticsReportToolStripMenuItem.Click += new System.EventHandler(this.sendDiagnosticsReportToolStripMenuItem_Click);
             // 
-            // promptForAudioIDOnAddToolStripMenuItem
-            // 
-            this.promptForAudioIDOnAddToolStripMenuItem.CheckOnClick = true;
-            this.promptForAudioIDOnAddToolStripMenuItem.Name = "promptForAudioIDOnAddToolStripMenuItem";
-            this.promptForAudioIDOnAddToolStripMenuItem.Size = new System.Drawing.Size(306, 26);
-            this.promptForAudioIDOnAddToolStripMenuItem.Text = "Prompt For AudioID on Add";
-            this.promptForAudioIDOnAddToolStripMenuItem.Click += new System.EventHandler(this.promptForAudioIDOnAddToolStripMenuItem_Click);
-            // 
             // TeddyMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.ClientSize = new System.Drawing.Size(1193, 554);
             this.Controls.Add(this.lblMessage);
+            this.Controls.Add(this.LoadLocalDirectoryButton);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.grpCardContent);
             this.Controls.Add(this.txtLog);
@@ -643,7 +659,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TeddyMain";
-            this.Text = "TeddyBench";
+            this.Text = "MaisieBench";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.grpCardContent.ResumeLayout(false);
@@ -720,6 +736,7 @@
         private System.Windows.Forms.ToolStripMenuItem downloadToniesjsonOnStartupToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadToniesjsonNowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem promptForAudioIDOnAddToolStripMenuItem;
+        private System.Windows.Forms.Button LoadLocalDirectoryButton;
     }
 }
 
