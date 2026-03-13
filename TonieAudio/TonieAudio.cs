@@ -446,6 +446,7 @@ namespace TonieFile
             encoder.Bitrate = bitRate;
             encoder.UseVBR = useVbr;
 
+            // MAISIE_TODO more audio id generation nonsense..
             if (audioId == 0)
             {
                 audioId = (uint)((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();

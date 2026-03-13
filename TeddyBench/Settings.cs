@@ -15,6 +15,7 @@ namespace TeddyBench
         public string NfcType = "Proxmark3";
         public bool DebugWindow = false;
         public bool DownloadJson = true;
+        public bool PromptForAudioID = false;
 
         public static Settings FromFile(string file)
         {

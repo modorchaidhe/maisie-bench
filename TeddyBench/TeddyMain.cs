@@ -57,7 +57,7 @@ namespace TeddyBench
         private SafeThread AsyncTagActionThread = null;
         private System.Windows.Forms.Timer StatusBarTimer = null;
 
-        private string TitleString => "TeddyBench - " + GetVersion();
+        private string TitleString => "MaisieBench - " + GetVersion();
 
         private SafeThread PlayThread = null;
         private bool PlayThreadStop = true;
@@ -262,13 +262,13 @@ namespace TeddyBench
 
             Settings = Settings.FromFile("teddyBench.cfg");
 
-            lstTonies.LargeImageList = new ImageList();
-            lstTonies.LargeImageList.ImageSize = new Size(128, 128);
-            lstTonies.LargeImageList.ColorDepth = ColorDepth.Depth32Bit;
-            lstTonies.LargeImageList.Images.Add("unknown", ResizeImage(Resources.unknown, 128, 128));
-            lstTonies.LargeImageList.Images.Add("custom", ResizeImage(Resources.custom, 128, 128));
-            lstTonies.ListViewItemSorter = new ListViewItemComparer(2);
-            lstTonies.DoubleBuffered(true);
+            tonieDisplayList.LargeImageList = new ImageList();
+            tonieDisplayList.LargeImageList.ImageSize = new Size(128, 128);
+            tonieDisplayList.LargeImageList.ColorDepth = ColorDepth.Depth32Bit;
+            tonieDisplayList.LargeImageList.Images.Add("unknown", ResizeImage(Resources.unknown, 128, 128));
+            tonieDisplayList.LargeImageList.Images.Add("custom", ResizeImage(Resources.custom, 128, 128));
+            tonieDisplayList.ListViewItemSorter = new ListViewItemComparer(2);
+            tonieDisplayList.DoubleBuffered(true);
             cmbSorting.SelectedIndex = 2;
             Text = TitleString;
 
@@ -305,7 +305,7 @@ namespace TeddyBench
             Settings.Save("teddyBench.cfg");
         }
 
-
+#region Proxmark3 Methods
         private void Proxmark3_FlashResult(object sender, bool e)
         {
             if (InvokeRequired)
@@ -410,6 +410,60 @@ namespace TeddyBench
             }
         }
 
+        private void Proxmark3_UidFound(object sender, string e)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => Proxmark3_UidFound(sender, e)));
+                return;
+            }
+
+            bool found = false;
+
+            if (e != null)
+            {
+                /* already handled this UID? then return */
+                if (e == LastFoundUid)
+                {
+                    return;
+                }
+
+                foreach (ListViewItem item in tonieDisplayList.Items)
+                {
+                    ListViewTag tag = item.Tag as ListViewTag;
+
+                    if (tag.Uid == e)
+                    {
+                        if (tonieDisplayList.SelectedItems.Count == 1 && tonieDisplayList.SelectedItems[0] == item)
+                        {
+                            return;
+                        }
+                        foreach (ListViewItem sel in tonieDisplayList.SelectedItems)
+                        {
+                            sel.Selected = false;
+                        }
+                        item.Selected = true;
+                        item.EnsureVisible();
+                        ActiveControl = tonieDisplayList;
+                        found = true;
+                        AutoSelected = true;
+                    }
+                }
+            }
+
+            LastFoundUid = e;
+
+            /* tag was removed and the selected item was auto selected because tag was found, deselect again */
+            if (!found && AutoSelected)
+            {
+                foreach (ListViewItem sel in tonieDisplayList.SelectedItems)
+                {
+                    sel.Selected = false;
+                }
+            }
+        }
+#endregion
+
         private void UpdateStatusBar()
         {
             string text = "";
@@ -455,59 +509,6 @@ namespace TeddyBench
                     statusStrip1.Show();
                 }
                 statusLabel.Text = text.Trim().Trim('|').Trim();
-            }
-        }
-
-        private void Proxmark3_UidFound(object sender, string e)
-        {
-            if (InvokeRequired)
-            {
-                BeginInvoke(new Action(() => Proxmark3_UidFound(sender, e)));
-                return;
-            }
-
-            bool found = false;
-
-            if (e != null)
-            {
-                /* already handled this UID? then return */
-                if (e == LastFoundUid)
-                {
-                    return;
-                }
-
-                foreach (ListViewItem item in lstTonies.Items)
-                {
-                    ListViewTag tag = item.Tag as ListViewTag;
-
-                    if (tag.Uid == e)
-                    {
-                        if (lstTonies.SelectedItems.Count == 1 && lstTonies.SelectedItems[0] == item)
-                        {
-                            return;
-                        }
-                        foreach (ListViewItem sel in lstTonies.SelectedItems)
-                        {
-                            sel.Selected = false;
-                        }
-                        item.Selected = true;
-                        item.EnsureVisible();
-                        ActiveControl = lstTonies;
-                        found = true;
-                        AutoSelected = true;
-                    }
-                }
-            }
-
-            LastFoundUid = e;
-
-            /* tag was removed and the selected item was auto selected because tag was found, deselect again */
-            if (!found && AutoSelected)
-            {
-                foreach (ListViewItem sel in lstTonies.SelectedItems)
-                {
-                    sel.Selected = false;
-                }
             }
         }
 
@@ -586,10 +587,13 @@ namespace TeddyBench
 
             if (drop != null)
             {
-                AddFiles(drop, GetAudioID());
+                // MAISIE_TODO another place to add focus dependent logic?
+                AddFilesNoFocus(drop, GetAudioID());
             }
         }
 
+
+        // MAISIE_TODO: What in the world is an Audio ID?
         private uint GetAudioID()
         {
             if(MessageBox.Show("Do you want to set a specific Audio-ID? If you don't know, just say 'No'.", "Set specific Audio ID", MessageBoxButtons.YesNo) == DialogResult.No)
@@ -598,6 +602,7 @@ namespace TeddyBench
             }
 
             AskHexForm form = new AskHexForm();
+
             if(form.ShowDialog() != DialogResult.OK)
             {
                 return uint.MaxValue;
@@ -819,7 +824,7 @@ namespace TeddyBench
                 txtLog.Visible = false;
                 grpCardContent.Visible = true;
                 lblMessage.Visible = false;
-                lstTonies.Items.Clear();
+                tonieDisplayList.Items.Clear();
                 RegisteredItems.Clear();
 
                 try
@@ -837,9 +842,9 @@ namespace TeddyBench
                             item.Tag = tag;
                             item.Text = tag.Uid;
                             item.ImageKey = "unknown";
-                            item.Group = lstTonies.Groups[3];
+                            item.Group = tonieDisplayList.Groups[3];
 
-                            lstTonies.Items.Add(item);
+                            tonieDisplayList.Items.Add(item);
 
                             RegisteredItems.Add(item.Tag as ListViewTag, item);
                         }
@@ -858,9 +863,9 @@ namespace TeddyBench
                             item.Tag = tag;
                             item.Text = match.Groups["prod"].Value + " - " + match.Groups["name"].Value;
                             item.ImageKey = "unknown";
-                            item.Group = lstTonies.Groups[3];
+                            item.Group = tonieDisplayList.Groups[3];
 
-                            lstTonies.Items.Add(item);
+                            tonieDisplayList.Items.Add(item);
 
                             RegisteredItems.Add(item.Tag as ListViewTag, item);
                         }
@@ -870,12 +875,13 @@ namespace TeddyBench
                 {
                     LogWindow.Log(LogWindow.eLogLevel.Error, "Exception while scanning directory '" + CurrentDirectory + "':" + ex.Message);
                 }
-                lstTonies.Sort();
+                tonieDisplayList.Sort();
             }
 
             StartAnalyzeThread();
         }
 
+#region Analysis Methods
         private void StartAnalyzeThread()
         {
             AnalyzeThreadStop = false;
@@ -951,14 +957,14 @@ namespace TeddyBench
                                             tonieName = TonieInfoCustom[hash];
                                         }
                                     }
-                                    if (!string.IsNullOrEmpty(info.Pic) && !lstTonies.LargeImageList.Images.ContainsKey(hash))
+                                    if (!string.IsNullOrEmpty(info.Pic) && !tonieDisplayList.LargeImageList.Images.ContainsKey(hash))
                                     {
                                         Image img = GetImage(info.Pic, hash);
                                         if (img != null)
                                         {
                                             this.BeginInvoke(new Action(() =>
                                             {
-                                                lstTonies.LargeImageList.Images.Add(hash, img);
+                                                tonieDisplayList.LargeImageList.Images.Add(hash, img);
                                             }));
                                         }
                                     }
@@ -1037,6 +1043,9 @@ namespace TeddyBench
             }
         }
 
+#endregion
+
+#region Image Methods
         private Image GetImage(string pic, string hash)
         {
             string cacheFileName = Path.Combine("cache", hash + ".png");
@@ -1079,23 +1088,9 @@ namespace TeddyBench
             return null;
         }
 
-        private TonieAudio GetTonieAudio(string fileName)
+        private void SetImage(string path)
         {
-            FileInfo info = new FileInfo(fileName);
-            if (CachedAudios.ContainsKey(fileName))
-            {
-                Tuple<TonieAudio, DateTime> cachedItem = CachedAudios[fileName];
-                if (cachedItem.Item2 == info.LastWriteTime)
-                {
-                    return cachedItem.Item1;
-                }
-                CachedAudios.Remove(fileName);
-            }
 
-            TonieAudio file = TonieAudio.FromFile(fileName, false);
-            CachedAudios.Add(fileName, new Tuple<TonieAudio, DateTime>(file, info.LastWriteTime));
-
-            return file;
         }
 
         public static Bitmap ResizeImage(Image image, int width, int height)
@@ -1132,7 +1127,28 @@ namespace TeddyBench
 
             return destImage;
         }
+#endregion
 
+        private TonieAudio GetTonieAudio(string fileName)
+        {
+            FileInfo info = new FileInfo(fileName);
+            if (CachedAudios.ContainsKey(fileName))
+            {
+                Tuple<TonieAudio, DateTime> cachedItem = CachedAudios[fileName];
+                if (cachedItem.Item2 == info.LastWriteTime)
+                {
+                    return cachedItem.Item1;
+                }
+                CachedAudios.Remove(fileName);
+            }
+
+            TonieAudio file = TonieAudio.FromFile(fileName, false);
+            CachedAudios.Add(fileName, new Tuple<TonieAudio, DateTime>(file, info.LastWriteTime));
+
+            return file;
+        }
+
+        // MAISIE_TODO: This is where to add logic for adding to focused tonie in list
         private void btnAdd_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
@@ -1140,69 +1156,85 @@ namespace TeddyBench
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                AddFiles(dlg.FileNames, GetAudioID());
+                if(Settings.PromptForAudioID == true)
+                {
+                    AddFilesNoFocus(dlg.FileNames, GetAudioID());
+                }
+                else
+                {
+                    AddFilesNoFocus(dlg.FileNames);
+                }
             }
         }
 
-        private void AddFiles(string[] fileNames, uint id = uint.MaxValue)
+        // For adding files when no Tonie has been selected
+        private void AddFilesNoFocus(string[] fileNames, uint id = uint.MaxValue)
         {
             AskUIDForm ask = new AskUIDForm(RfidReader);
 
             if (ask.ShowDialog() == DialogResult.OK)
             {
-                if (fileNames.Count() == 1)
+                AddFiles(fileNames, ask.Uid, id);
+            }
+        }
+
+        private void AddFiles(string[] fileNames, string uid, uint id = uint.MaxValue)
+        { 
+            if (fileNames.Count() == 1)
+            {
+                string fileName = fileNames[0];
+
+                // MAISIE_TODO change when expanding file type compatibility
+                if (fileName.ToLower().EndsWith(".mp3") || fileName.ToLower().EndsWith(".ogg"))
                 {
-                    string fileName = fileNames[0];
-
-                    if (fileName.ToLower().EndsWith(".mp3") || fileName.ToLower().EndsWith(".ogg"))
+                    switch (MessageBox.Show("You are about to encode a single MP3/Ogg, is this right?", "Encode a file", MessageBoxButtons.YesNo))
                     {
-                        switch (MessageBox.Show("You are about to encode a single MP3/Ogg, is this right?", "Encode a file", MessageBoxButtons.YesNo))
-                        {
-                            case DialogResult.No:
-                                return;
-                            case DialogResult.Yes:
-                                EncodeFile(ask.Uid, new[] { fileName }, id);
-                                return;
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            TonieAudio dumpFile = TonieAudio.FromFile(fileName);
-
-                            if (dumpFile.FileContent.Length > 0)
-                            {
-                                CopyFile(ask.Uid, fileName);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("The file you have chosen is not supported.", "Add file...");
+                        case DialogResult.No:
                             return;
-                        }
+                        case DialogResult.Yes:
+                            EncodeFile(uid, new[] { fileName }, id);
+                            return;
                     }
                 }
                 else
                 {
-                    if (fileNames.Where(f => !(f.ToLower().EndsWith(".mp3") || f.ToLower().EndsWith(".ogg"))).Count() > 0)
+                    try
                     {
-                        MessageBox.Show("Please select MP3/Ogg files only.", "Add file...");
+                        TonieAudio dumpFile = TonieAudio.FromFile(fileName);
+
+                        if (dumpFile.FileContent.Length > 0)
+                        {
+                            CopyFile(uid, fileName);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("The file you have chosen is not supported.", "Add file...");
                         return;
                     }
-
-                    TrackSortDialog sorter = new TrackSortDialog(fileNames);
-
-                    if(sorter.ShowDialog() == DialogResult.Cancel)
-                    {
-                        return;
-                    }
-
-                    string[] sorted = sorter.SortedFiles;
-
-                    EncodeFile(ask.Uid, sorted, id);
                 }
             }
+            else
+            {
+                // MAISIE_TODO update here to allow for more file types...
+                if (fileNames.Where(f => !(f.ToLower().EndsWith(".mp3") || f.ToLower().EndsWith(".ogg"))).Count() > 0)
+                {
+                    MessageBox.Show("Please select MP3/Ogg files only.", "Add file...");
+                    return;
+                }
+
+                TrackSortDialog sorter = new TrackSortDialog(fileNames);
+
+                if(sorter.ShowDialog() == DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                string[] sorted = sorter.SortedFiles;
+
+                EncodeFile(uid, sorted, id);
+            }
+            
         }
 
         private void CopyFile(string uid, string fileName)
@@ -1312,6 +1344,7 @@ namespace TeddyBench
 
                 try
                 {
+                    // MAISIE_TODO is this the best way to make an audio ID? Used in Oggfile writing..
                     if (id == uint.MaxValue)
                     {
                         id = (uint)(DateTimeOffset.Now.ToUnixTimeSeconds() - 0x50000000);
@@ -1423,24 +1456,24 @@ namespace TeddyBench
         {
             if (e.Button == MouseButtons.Right)
             {
-                if (lstTonies.FocusedItem.Bounds.Contains(e.Location))
+                if (tonieDisplayList.FocusedItem.Bounds.Contains(e.Location))
                 {
-                    LastSelectediItem = lstTonies.SelectedItems[0];
+                    LastSelectediItem = tonieDisplayList.SelectedItems[0];
                     TonieContextMenu.Show(System.Windows.Forms.Cursor.Position);
                 }
             }
             else
             {
-                if (lstTonies.SelectedItems.Count == 1)
+                if (tonieDisplayList.SelectedItems.Count == 1)
                 {
-                    if (lstTonies.SelectedItems[0] == LastSelectediItem)
+                    if (tonieDisplayList.SelectedItems[0] == LastSelectediItem)
                     {
-                        if (lstTonies.SelectedItems[0].ImageKey == "custom")
+                        if (tonieDisplayList.SelectedItems[0].ImageKey == "custom")
                         {
                             LastSelectediItem.BeginEdit();
                         }
                     }
-                    LastSelectediItem = lstTonies.SelectedItems[0];
+                    LastSelectediItem = tonieDisplayList.SelectedItems[0];
                 }
             }
         }
@@ -1452,16 +1485,16 @@ namespace TeddyBench
 
         private void lstTonies_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyData == Keys.F2 && lstTonies.SelectedItems.Count > 0)
+            if (e.KeyData == Keys.F2 && tonieDisplayList.SelectedItems.Count > 0)
             {
-                if (lstTonies.SelectedItems[0].ImageKey == "custom")
+                if (tonieDisplayList.SelectedItems[0].ImageKey == "custom")
                 {
-                    lstTonies.SelectedItems[0].BeginEdit();
+                    tonieDisplayList.SelectedItems[0].BeginEdit();
                 }
             }
             if (e.Control && e.KeyCode == Keys.A)
             {
-                foreach (ListViewItem item in lstTonies.Items)
+                foreach (ListViewItem item in tonieDisplayList.Items)
                 {
                     item.Selected = true;
                 }
@@ -1479,7 +1512,7 @@ namespace TeddyBench
 
         private void lstTonies_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
-            ListViewItem item = lstTonies.Items[e.Item];
+            ListViewItem item = tonieDisplayList.Items[e.Item];
             ListViewTag tag = item.Tag as ListViewTag;
 
             if (e.Label == null)
@@ -1506,9 +1539,9 @@ namespace TeddyBench
 
         private void ReassignSelected()
         {
-            if (lstTonies.SelectedItems.Count == 1)
+            if (tonieDisplayList.SelectedItems.Count == 1)
             {
-                ListViewItem item = lstTonies.SelectedItems[0];
+                ListViewItem item = tonieDisplayList.SelectedItems[0];
 
                 ListViewTag tag = item.Tag as ListViewTag;
                 var fi = new FileInfo(tag.FileName);
@@ -1574,7 +1607,7 @@ namespace TeddyBench
 
             StopAnalyzeThread();
 
-            if (lstTonies.SelectedItems.Count > 1)
+            if (tonieDisplayList.SelectedItems.Count > 1)
             {
                 switch (MessageBox.Show("Delete all selected files?", "Delete files?", MessageBoxButtons.YesNoCancel))
                 {
@@ -1588,7 +1621,7 @@ namespace TeddyBench
                 }
             }
 
-            foreach (ListViewItem item in lstTonies.SelectedItems)
+            foreach (ListViewItem item in tonieDisplayList.SelectedItems)
             {
                 ListViewTag tag = item.Tag as ListViewTag;
                 string current = item.Text;
@@ -1642,7 +1675,7 @@ namespace TeddyBench
                     "Please *do not* share these files as they could contain information which can be used to identify your tonie ID. " +
                     "Also be aware that sharing these files is most likely illegal in your country.", "Legal information", MessageBoxButtons.OK);
 
-                foreach (ListViewItem item in lstTonies.SelectedItems)
+                foreach (ListViewItem item in tonieDisplayList.SelectedItems)
                 {
                     ListViewTag tag = item.Tag as ListViewTag;
                     string current = item.Text;
@@ -1739,7 +1772,7 @@ namespace TeddyBench
             }
             string outputLocation = dlg.SelectedPath;
 
-            foreach (ListViewItem item in lstTonies.SelectedItems)
+            foreach (ListViewItem item in tonieDisplayList.SelectedItems)
             {
                 ListViewTag tag = item.Tag as ListViewTag;
                 string current = item.Text;
@@ -1767,30 +1800,30 @@ namespace TeddyBench
 
         private void UpdateSorting()
         {
-            foreach (ListViewItem item in lstTonies.Items)
+            foreach (ListViewItem item in tonieDisplayList.Items)
             {
                 if (cmbSorting.SelectedIndex == 3)
                 {
                     switch (item.ImageKey)
                     {
                         case "unknown":
-                            item.Group = lstTonies.Groups[0];
+                            item.Group = tonieDisplayList.Groups[0];
                             break;
                         case "custom":
-                            item.Group = lstTonies.Groups[1];
+                            item.Group = tonieDisplayList.Groups[1];
                             break;
                         default:
-                            item.Group = lstTonies.Groups[2];
+                            item.Group = tonieDisplayList.Groups[2];
                             break;
                     }
                 }
                 else
                 {
-                    item.Group = lstTonies.Groups[3];
+                    item.Group = tonieDisplayList.Groups[3];
                 }
             }
-            (lstTonies.ListViewItemSorter as ListViewItemComparer).Characteristic = cmbSorting.SelectedIndex;
-            lstTonies.Sort();
+            (tonieDisplayList.ListViewItemSorter as ListViewItemComparer).Characteristic = cmbSorting.SelectedIndex;
+            tonieDisplayList.Sort();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1811,7 +1844,7 @@ namespace TeddyBench
 
         private string GetVersion()
         {
-            return Application.ProductVersion + (ThisAssembly.Git.IsDirty ? ",dirty" : "");
+            return Application.ProductVersion + (ThisAssembly.Git.IsDirty ? ", dirty" : "");
         }
 
         private async void reportselectedFilesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1821,9 +1854,9 @@ namespace TeddyBench
 
         private void toggleLiveFlagToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            bool bUnhideAll = (lstTonies.SelectedItems.Count > 1);
+            bool bUnhideAll = (tonieDisplayList.SelectedItems.Count > 1);
 
-            foreach (ListViewItem t in lstTonies.SelectedItems)
+            foreach (ListViewItem t in tonieDisplayList.SelectedItems)
             {
                 ListViewTag tag = t.Tag as ListViewTag;
 
@@ -1842,17 +1875,17 @@ namespace TeddyBench
 
         private async Task<bool> ReportSelected()
         {
-            if (lstTonies.SelectedItems.Count == 0)
+            if (tonieDisplayList.SelectedItems.Count == 0)
             {
                 return false;
             }
 
             StringBuilder str = new StringBuilder();
 
-            str.AppendLine(" Reporting " + lstTonies.SelectedItems.Count + " files");
+            str.AppendLine(" Reporting " + tonieDisplayList.SelectedItems.Count + " files");
             str.AppendLine("-----------------------------------");
 
-            foreach (ListViewItem t in lstTonies.SelectedItems)
+            foreach (ListViewItem t in tonieDisplayList.SelectedItems)
             {
                 ListViewTag tag = t.Tag as ListViewTag;
 
@@ -2297,12 +2330,12 @@ namespace TeddyBench
         {
             if (PlayThread == null)
             {
-                if (lstTonies.SelectedItems.Count != 1)
+                if (tonieDisplayList.SelectedItems.Count != 1)
                 {
                     return;
                 }
 
-                var selected = lstTonies.SelectedItems[0];
+                var selected = tonieDisplayList.SelectedItems[0];
                 ListViewTag tag = selected.Tag as ListViewTag;
                 string file = tag.FileName;
 
@@ -2448,7 +2481,7 @@ namespace TeddyBench
 
         private void downloadToniesjsonOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Settings.DownloadJson = !downloadToniesjsonOnStartupToolStripMenuItem.Checked;
+            Settings.DownloadJson = downloadToniesjsonOnStartupToolStripMenuItem.Checked;
             SaveSettings();
         }
 
@@ -2458,6 +2491,12 @@ namespace TeddyBench
             {
                 LoadJson(true);
             }, "JSON Downloader").Start();
+        }
+
+        private void promptForAudioIDOnAddToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.PromptForAudioID = promptForAudioIDOnAddToolStripMenuItem.Checked;
+            SaveSettings();
         }
     }
 }
