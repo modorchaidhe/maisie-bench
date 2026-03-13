@@ -64,9 +64,9 @@ namespace TeddyBench
 
         private void txtUid_TextChanged(object sender, EventArgs e)
         {
-            if (!txtUid.Text.StartsWith("E00403"))
+            if (!txtUid.Text.StartsWith("E0040350"))
             {
-                txtUid.Text = "E00403";
+                txtUid.Text = "E0040350";
                 txtUid.Select(6, 1);
             }
 

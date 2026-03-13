@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace TonieFile
 {
@@ -38,6 +37,7 @@ namespace TonieFile
                     }
                     return ret;
                 }
+                private set {}
             }
             [JsonProperty("model")]
             public string Model;
