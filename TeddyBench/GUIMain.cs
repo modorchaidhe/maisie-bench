@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -43,8 +42,8 @@ namespace CaraBosca.GUI
         private Dictionary<ListViewTag, ListViewItem> RegisteredItems = new Dictionary<ListViewTag, ListViewItem>();
 
         private static object TonieInfoLock = new object();
-        private static TonieTools.TonieData[] TonieInfo = new TonieTools.TonieData[0];
-        private static Dictionary<string, TonieTools.CustomTonieData> TonieInfoCustom = new Dictionary<string, TonieTools.CustomTonieData>();
+        private static TonieData[] TonieInfo = new TonieData[0];
+        private static Dictionary<string, CustomTonieData> TonieInfoCustom = new Dictionary<string, CustomTonieData>();
         private static string TonieInfoString = "";
 
         private Dictionary<string, Tuple<TonieAudio, DateTime>> CachedAudios = new Dictionary<string, Tuple<TonieAudio, DateTime>>();
@@ -57,7 +56,7 @@ namespace CaraBosca.GUI
         private SafeThread AsyncTagActionThread = null;
         private System.Windows.Forms.Timer StatusBarTimer = null;
 
-        private string TitleString => "MaisieBench - " + GetVersion();
+        private string TitleString => "CaraBosca - " + CaraBosca.GetVersion();
 
         private SafeThread PlayThread = null;
         private bool PlayThreadStop = true;
@@ -69,7 +68,7 @@ namespace CaraBosca.GUI
             public string FileName;
             public FileInfo FileInfo;
             public string Hash;
-            public TonieTools.TonieData Info;
+            public TonieData Info;
             public string Uid;
             public uint AudioId;
 
@@ -78,7 +77,7 @@ namespace CaraBosca.GUI
                 FileName = filename;
 
                 FileInfo = new FileInfo(FileName);
-                Uid = ReverseUid(FileInfo.Directory.Name + FileInfo.Name);
+                Uid = TonieData.ReverseUid(FileInfo.Directory.Name + FileInfo.Name);
             }
         }
 
@@ -195,7 +194,7 @@ namespace CaraBosca.GUI
                     catch (Exception e)
                     {
                         TonieInfoString = "| Reading tonies.json Failed";
-                        TonieInfo = new TonieTools.TonieData[0];
+                        TonieInfo = new TonieData[0];
                     }
                 }
 
@@ -210,19 +209,19 @@ namespace CaraBosca.GUI
                     try
                     {
                         TonieInfoString = "| Parsing...";
-                        TonieInfo = JsonConvert.DeserializeObject<TonieTools.TonieData[]>(jsonContent);
+                        TonieInfo = JsonConvert.DeserializeObject<TonieData[]>(jsonContent);
                         TonieInfoString = "";
                     }
                     catch (Exception e)
                     {
                         TonieInfoString = "| Parsing Failed";
-                        TonieInfo = new TonieTools.TonieData[0];
+                        TonieInfo = new TonieData[0];
                         ReportException("Parse tonies.json", e);
                     }
 
                     try
                     {
-                        TonieInfoCustom = JsonConvert.DeserializeObject<Dictionary<string, TonieTools.CustomTonieData>>(File.ReadAllText("customTonies.json"));
+                        TonieInfoCustom = JsonConvert.DeserializeObject<Dictionary<string, CustomTonieData>>(File.ReadAllText("customTonies.json"));
                     }
                     catch (FileNotFoundException e)
                     {
@@ -237,21 +236,6 @@ namespace CaraBosca.GUI
             catch (Exception e)
             {
                 return;
-            }
-        }
-
-        void SaveJson()
-        {
-            lock (TonieInfoLock)
-            {
-                try
-                {
-                    File.WriteAllText("customTonies.json", JsonConvert.SerializeObject(TonieInfoCustom, Formatting.Indented));
-                }
-                catch (Exception e)
-                {
-                    return;
-                }
             }
         }
 
@@ -963,7 +947,7 @@ namespace CaraBosca.GUI
                                 LogWindow.Log(LogWindow.eLogLevel.DebugVerbose, "GetTonieAudio... done");
                                 string image = "";
                                 string hash = BitConverter.ToString(dumpFile.Header.Hash).Replace("-", "");
-                                IEnumerable<TonieTools.TonieData> found = new TonieTools.TonieData[0];
+                                IEnumerable<TonieData> found = new TonieData[0];
 
                                 lock (TonieInfoLock)
                                 {
@@ -1012,7 +996,7 @@ namespace CaraBosca.GUI
                                 }
                                 else
                                 {
-                                    tag.Info = new TonieTools.TonieData();
+                                    tag.Info = new TonieData();
                                     image = "unknown";
 
                                     lock (TonieInfoLock)
@@ -1304,8 +1288,8 @@ namespace CaraBosca.GUI
 
             EncodeThread = new SafeThread(() =>
             {
-                string newDir = Path.Combine(CurrentDirectory, ReverseUid(uid).Substring(0, 8));
-                string newFile = Path.Combine(newDir, ReverseUid(uid).Substring(8, 8));
+                string newDir = Path.Combine(CurrentDirectory, TonieData.ReverseUid(uid).Substring(0, 8));
+                string newFile = Path.Combine(newDir, TonieData.ReverseUid(uid).Substring(8, 8));
 
                 try
                 {
@@ -1396,8 +1380,8 @@ namespace CaraBosca.GUI
 
             EncodeThread = new SafeThread(() =>
             {
-                string newDir = Path.Combine(CurrentDirectory, ReverseUid(uid).Substring(0, 8));
-                string newFile = Path.Combine(newDir, ReverseUid(uid).Substring(8, 8));
+                string newDir = Path.Combine(CurrentDirectory, TonieData.ReverseUid(uid).Substring(0, 8));
+                string newFile = Path.Combine(newDir, TonieData.ReverseUid(uid).Substring(8, 8));
 
                 TonieAudio audio = null;
 
@@ -1438,16 +1422,6 @@ namespace CaraBosca.GUI
                 RefreshCardContent();
             }, "EncodeThread");
             EncodeThread.Start();
-        }
-
-
-        public static string ReverseUid(string uid)
-        {
-            List<string> groups = (from Match m in Regex.Matches(uid, @"[A-Fa-f0-9]{2}") select m.Value).ToList();
-            groups.Reverse();
-            string ret = string.Join("", groups.ToArray());
-
-            return ret;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1583,13 +1557,12 @@ namespace CaraBosca.GUI
             {
                 if (!TonieInfoCustom.ContainsKey(tag.Hash))
                 {
-                    TonieInfoCustom.Add(tag.Hash, new TonieTools.CustomTonieData());
+                    TonieInfoCustom.Add(tag.Hash, new CustomTonieData());
                 }
                 TonieInfoCustom[tag.Hash].Name = e.Label;
                 TonieInfoCustom[tag.Hash].imgPath = "";
+                FileManagement.SaveCustomTonieInfo("customTonies.json", TonieInfoCustom);
             }
-
-            SaveJson();
         }
 
         #endregion
@@ -1605,7 +1578,7 @@ namespace CaraBosca.GUI
 
                 ListViewTag tag = item.Tag as ListViewTag;
                 var fi = new FileInfo(tag.FileName);
-                string oldUid = ReverseUid(fi.Directory.Name + fi.Name);
+                string oldUid = TonieData.ReverseUid(fi.Directory.Name + fi.Name);
 
                 AskUIDForm dlg = new AskUIDForm(RfidReader);
                 dlg.Uid = oldUid;
@@ -1613,8 +1586,8 @@ namespace CaraBosca.GUI
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     string uid = dlg.Uid;
-                    string newDir = Path.Combine(CurrentDirectory, ReverseUid(uid).Substring(0, 8));
-                    string newFile = Path.Combine(newDir, ReverseUid(uid).Substring(8, 8));
+                    string newDir = Path.Combine(CurrentDirectory, TonieData.ReverseUid(uid).Substring(0, 8));
+                    string newFile = Path.Combine(newDir, TonieData.ReverseUid(uid).Substring(8, 8));
 
                     if (new FileInfo(newFile).FullName == fi.FullName)
                     {
@@ -1755,17 +1728,17 @@ namespace CaraBosca.GUI
 
                         string[] titles = null;
                         List<string> tags = new List<string>();
-                        tags.Add("TeddyVersion=" + GetVersion());
-                        tags.Add("TeddyFile=" + file);
+                        tags.Add("CaraBoscaVersion=" + CaraBosca.GetVersion());
+                        tags.Add("CaraBoscaFile=" + file);
 
                         string hashString = BitConverter.ToString(dump.Header.Hash).Replace("-", "");
-                        IEnumerable<TonieTools.TonieData> found = new TonieTools.TonieData[0];
+                        IEnumerable<TonieData> found = new TonieData[0];
 
                         lock (TonieInfoLock)
                         {
                             found = TonieInfo.Where(t => t.Hash.Contains(hashString));
                         }
-                        TonieTools.TonieData info = null;
+                        TonieData info = null;
 
                         if (found.Count() > 0)
                         {
@@ -1900,11 +1873,6 @@ namespace CaraBosca.GUI
         public static string RemoveInvalidChars(string filename)
         {
             return string.Concat(filename.Split(Path.GetInvalidFileNameChars()));
-        }
-
-        private string GetVersion()
-        {
-            return Application.ProductVersion + (ThisAssembly.Git.IsDirty ? ", dirty" : "");
         }
 
         private async void reportselectedFilesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2116,7 +2084,7 @@ namespace CaraBosca.GUI
                 form.Add(new StringContent(payload), "payload");
                 form.Add(new StringContent(message), "message");
                 form.Add(new StringContent(filename), "filename");
-                form.Add(new StringContent(GetVersion()), "version");
+                form.Add(new StringContent(CaraBosca.GetVersion()), "version");
 
                 HttpResponseMessage response = await httpClient.PostAsync("https://api.revvox.de/diag", form);
                 response.EnsureSuccessStatusCode();
@@ -2144,7 +2112,7 @@ namespace CaraBosca.GUI
                 {
                     customName = TonieInfoCustom[tag.Hash].Name;
                 }
-                TonieTools.DumpInfo(str, TonieTools.eDumpFormat.FormatText, tag.FileName, TonieInfo, customName);
+                FileManagement.DumpInfo(str, FileManagement.eDumpFormat.FormatText, tag.FileName, TonieInfo, customName);
             }
         }
 

@@ -5,87 +5,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace CaraBosca.Core
 {
-    public class TonieTools
-    {
-        public enum eDumpFormat
+
+public class FileManagement
+{
+       public enum eDumpFormat
         {
             FormatText,
             FormatCSV,
             FormatJSON
         };
-
-        public class TonieData
-        {
-            [JsonProperty("no")]
-            public string SortNumber_;
-            public string SortString
-            {
-                get
-                {
-                    string ret = "";
-
-                    if (!string.IsNullOrEmpty(Language))
-                    {
-                        ret += Language;
-                    }
-                    if (!string.IsNullOrEmpty(SortNumber_) && SortNumber_ != "na")
-                    {
-                        ret += int.Parse(SortNumber_).ToString("0000");
-                    }
-                    return ret;
-                }
-                private set {}
-            }
-            [JsonProperty("model")]
-            public string Model;
-            [JsonProperty("audio_id")]
-            public string[] AudioId_;
-            [JsonIgnore]
-            public long[] AudioIds
-            {
-                get
-                {
-                    List<long> ids = new List<long>();
-                    foreach (var id in AudioId_)
-                    {
-                        if (id != "" && id != "na")
-                        {
-                            ids.Add(long.Parse(id));
-                        }
-                    }
-                    return ids.ToArray();
-                }
-            }
-            [JsonProperty("hash")]
-            public string[] Hash;
-            [JsonProperty("title")]
-            public string Title;
-            [JsonProperty("series")]
-            public string Series;
-            [JsonProperty("episodes")]
-            public string Episodes; // unused
-            [JsonProperty("tracks")]
-            public string[] Tracks;
-            [JsonProperty("release")]
-            public string Release; // unused
-            [JsonProperty("language")]
-            public string Language;
-            [JsonProperty("category")]
-            public string Category; // unused
-            [JsonProperty("pic")]
-            public string Pic;
-        }
-
-        public class CustomTonieData
-        {
-            [JsonProperty("name")]
-            public string Name;
-            [JsonProperty("img_path")]
-            public string imgPath;
-        }
 
         public static bool DumpInfo(StringBuilder message, eDumpFormat dumpFormat, string file, TonieData[] tonieInfos, string customName = null)
         {
@@ -263,5 +195,59 @@ namespace CaraBosca.Core
                 return false;
             }
         }
-    }
+
+        public static TonieData[] LoadJson(string path)
+        {
+            TonieData[] data = null;
+            try
+            {
+                if (path.StartsWith("http"))
+                {
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(path);
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    TextReader reader = new StreamReader(response.GetResponseStream());
+
+                    data = JsonConvert.DeserializeObject<TonieData[]>(reader.ReadToEnd());
+                }
+                else if (File.Exists(path))
+                {
+                    data = JsonConvert.DeserializeObject<TonieData[]>(File.ReadAllText(path));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to load JSON:");
+                Console.WriteLine(e.Message);
+                return null;
+            }
+
+            return data;
+        }
+
+        public static void SaveJson(string path, TonieData[] data)
+        {
+            try
+            {
+                File.WriteAllText(path, JsonConvert.SerializeObject(data, Formatting.Indented));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to write JSON:");
+                Console.WriteLine(e.Message);
+                return;
+            }
+        }
+        public static void SaveCustomTonieInfo(string path, Dictionary<string, CustomTonieData> customInfo)
+        {
+            try
+            {
+                File.WriteAllText(path, JsonConvert.SerializeObject(customInfo, Formatting.Indented));
+            }
+            catch (Exception e)
+            {
+                return;
+            }   
+        }
+}
+
 }

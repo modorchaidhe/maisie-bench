@@ -35,7 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -47,47 +47,7 @@ namespace CaraBosca.CLI
     {
         public static int Verbosity = 0;
 
-        private static TonieTools.TonieData[] TonieInfos = new TonieTools.TonieData[0];
-
-
-        public static void LoadJson(string path)
-        {
-            try
-            {
-                if (path.StartsWith("http"))
-                {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(path);
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                    TextReader reader = new StreamReader(response.GetResponseStream());
-
-                    TonieInfos = JsonConvert.DeserializeObject<TonieTools.TonieData[]>(reader.ReadToEnd());
-                }
-                else if (File.Exists(path))
-                {
-                    TonieInfos = JsonConvert.DeserializeObject<TonieTools.TonieData[]>(File.ReadAllText(path));
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Failed to load JSON:");
-                Console.WriteLine(e.Message);
-                return;
-            }
-        }
-
-        public static void SaveJson(string path)
-        {
-            try
-            {
-                File.WriteAllText(path, JsonConvert.SerializeObject(TonieInfos, Formatting.Indented));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Failed to load JSON:");
-                Console.WriteLine(e.Message);
-                return;
-            }
-        }
+        private static TonieData[] TonieInfos = new TonieData[0];
 
         public static string FormatGranuleCue(ulong granule)
         {
@@ -160,7 +120,7 @@ namespace CaraBosca.CLI
         {
             bool showLicense = false;
             bool showHelp = false;
-            TonieTools.eDumpFormat dumpFormat = TonieTools.eDumpFormat.FormatText;
+            FileManagement.eDumpFormat dumpFormat = FileManagement.eDumpFormat.FormatText;
             bool useVbr = false;
             bool reallyRename = false;
             bool deleteDuplicates = false;
@@ -186,7 +146,7 @@ namespace CaraBosca.CLI
                 { "d",          "rename: delete duplicates",                                v => { deleteDuplicates = true; } },
                 { "w|write=",   "info: write updated json to local file",                   (string v) => { writeJson = v; } },
                 { "j|json=",    "Set JSON file/URL with details about tonies",              (string r) => jsonFile = r },
-                { "f|format=",  "Output details as: csv, json or text",                     v => { switch(v) { case "csv":  dumpFormat = TonieTools.eDumpFormat.FormatCSV; break; case "json":  dumpFormat = TonieTools.eDumpFormat.FormatJSON; break; case "text":  dumpFormat = TonieTools.eDumpFormat.FormatText; break; } } },
+                { "f|format=",  "Output details as: csv, json or text",                     v => { switch(v) { case "csv":  dumpFormat = FileManagement.eDumpFormat.FormatCSV; break; case "json":  dumpFormat = FileManagement.eDumpFormat.FormatJSON; break; case "text":  dumpFormat = FileManagement.eDumpFormat.FormatText; break; } } },
                 { "v",          "increase debug message verbosity",                         v => { if (v != null) ++Verbosity; } },
                 { "h|help",     "show this message and exit",                               h => showHelp = true },
                 { "license",    "show licenses and disclaimer",                             h => showLicense = true },
@@ -217,7 +177,7 @@ namespace CaraBosca.CLI
                 return;
             }
 
-            LoadJson(jsonFile);
+            TonieInfos = FileManagement.LoadJson(jsonFile);
 
             switch (mode)
             {
@@ -363,16 +323,16 @@ namespace CaraBosca.CLI
 
                         switch (dumpFormat)
                         {
-                            case TonieTools.eDumpFormat.FormatCSV:
+                            case FileManagement.eDumpFormat.FormatCSV:
                                 if (extra.Count > 1 || Directory.Exists(extra[0]))
                                 {
                                     Console.WriteLine("UID;AudioID;AudioDate;HeaderLength;HeaderOK;Padding;AudioLength;AudioLengthCheck;AudioHash;AudioHashCheck;Chapters;Segments;MinSegmentsPerPage;MaxSegmentsPerPage;SegLengthSum;HighestGranule;Time;MinGranules;MaxGranules;MinTime;MaxTime;");
                                 }
                                 break;
-                            case TonieTools.eDumpFormat.FormatJSON:
+                            case FileManagement.eDumpFormat.FormatJSON:
                                 Console.WriteLine("[");
                                 break;
-                            case TonieTools.eDumpFormat.FormatText:
+                            case FileManagement.eDumpFormat.FormatText:
                                 Console.WriteLine("[Mode: dump information]");
                                 break;
                         }
@@ -403,7 +363,7 @@ namespace CaraBosca.CLI
                             {
                                 StringBuilder message = new StringBuilder();
 
-                                TonieTools.DumpInfo(message, dumpFormat, file, TonieInfos);
+                                FileManagement.DumpInfo(message, dumpFormat, file, TonieInfos);
 
                                 Console.Write(message.ToString());
                             }
@@ -432,18 +392,18 @@ namespace CaraBosca.CLI
 
                         switch (dumpFormat)
                         {
-                            case TonieTools.eDumpFormat.FormatCSV:
+                            case FileManagement.eDumpFormat.FormatCSV:
                                 break;
-                            case TonieTools.eDumpFormat.FormatJSON:
+                            case FileManagement.eDumpFormat.FormatJSON:
                                 Console.WriteLine("]");
                                 break;
-                            case TonieTools.eDumpFormat.FormatText:
+                            case FileManagement.eDumpFormat.FormatText:
                                 break;
                         }
 
                         if (writeJson != null)
                         {
-                            SaveJson(writeJson);
+                            FileManagement.SaveJson(writeJson, TonieInfos);
                         }
                         break;
                     }
@@ -490,7 +450,7 @@ namespace CaraBosca.CLI
 
                                 string hashString = BitConverter.ToString(dump2.Header.Hash).Replace("-", "");
                                 var found = TonieInfos.Where(t => t.Hash.Contains(hashString));
-                                TonieTools.TonieData info = null;
+                                TonieData info = null;
 
                                 if (found.Count() > 0)
                                 {
