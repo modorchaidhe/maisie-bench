@@ -38,7 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="dog.ico" />
-    <Content Include="fragen.png" />
+    <Content Include="Media\fragen.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="5.7.0">
