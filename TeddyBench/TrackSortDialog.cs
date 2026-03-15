@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TeddyBench
+namespace CaraBosca.GUI
 {
     public partial class TrackSortDialog : Form
     {

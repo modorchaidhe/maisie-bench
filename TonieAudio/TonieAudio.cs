@@ -41,9 +41,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using static TonieFile.ProtoCoder;
+using static CaraBosca.Core.ProtoCoder;
 
-namespace TonieFile
+namespace CaraBosca.Core
 {
     public class TonieAudio
     {

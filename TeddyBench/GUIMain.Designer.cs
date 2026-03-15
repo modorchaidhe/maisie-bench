@@ -1,6 +1,6 @@
-﻿namespace TeddyBench
+﻿namespace CaraBosca.GUI
 {
-    partial class TeddyMain
+    partial class GUIMain
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -35,7 +35,7 @@
             System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Custom", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Retail", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TeddyMain));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GUIMain));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,6 +90,11 @@
             this.exportTooggToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendDiagnosticsReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toniePropertiesPanel = new System.Windows.Forms.Panel();
+            this.tonieProperties_NameLabel = new System.Windows.Forms.Label();
+            this.tonieProperties_UIDLabel = new System.Windows.Forms.Label();
+            this.TonieProperties_NameTextBox = new System.Windows.Forms.TextBox();
+            this.TonieProperties_UIDTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.grpCardContent.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -103,6 +108,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackPlayPosition)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.TonieContextMenu.SuspendLayout();
+            this.toniePropertiesPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -115,7 +121,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1193, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1238, 30);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -327,7 +333,7 @@
             this.grpCardContent.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.grpCardContent.Name = "grpCardContent";
             this.grpCardContent.Padding = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.grpCardContent.Size = new System.Drawing.Size(1193, 524);
+            this.grpCardContent.Size = new System.Drawing.Size(1238, 556);
             this.grpCardContent.TabIndex = 1;
             this.grpCardContent.TabStop = false;
             this.grpCardContent.Text = "Card Content";
@@ -348,11 +354,12 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.toniePropertiesPanel);
             this.splitContainer1.Panel2.Controls.Add(this.btnSave);
             this.splitContainer1.Panel2.Controls.Add(this.btnDelete);
             this.splitContainer1.Panel2.Controls.Add(this.btnAdd);
-            this.splitContainer1.Size = new System.Drawing.Size(1177, 495);
-            this.splitContainer1.SplitterDistance = 1097;
+            this.splitContainer1.Size = new System.Drawing.Size(1222, 527);
+            this.splitContainer1.SplitterDistance = 1000;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -377,7 +384,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.tonieDisplayList);
-            this.splitContainer2.Size = new System.Drawing.Size(1097, 495);
+            this.splitContainer2.Size = new System.Drawing.Size(1000, 527);
             this.splitContainer2.SplitterDistance = 36;
             this.splitContainer2.SplitterWidth = 1;
             this.splitContainer2.TabIndex = 1;
@@ -476,7 +483,7 @@
             this.tonieDisplayList.Margin = new System.Windows.Forms.Padding(4);
             this.tonieDisplayList.Name = "tonieDisplayList";
             this.tonieDisplayList.ShowItemToolTips = true;
-            this.tonieDisplayList.Size = new System.Drawing.Size(1097, 458);
+            this.tonieDisplayList.Size = new System.Drawing.Size(1000, 490);
             this.tonieDisplayList.TabIndex = 0;
             this.tonieDisplayList.TileSize = new System.Drawing.Size(64, 64);
             this.tonieDisplayList.UseCompatibleStateImageBehavior = false;
@@ -493,34 +500,34 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(5, 75);
+            this.btnSave.Location = new System.Drawing.Point(37, 109);
             this.btnSave.Margin = new System.Windows.Forms.Padding(4);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(116, 28);
+            this.btnSave.Size = new System.Drawing.Size(160, 28);
             this.btnSave.TabIndex = 1;
-            this.btnSave.Text = "Save as .ogg...";
+            this.btnSave.Text = "Export files as .ogg";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(5, 39);
+            this.btnDelete.Location = new System.Drawing.Point(37, 73);
             this.btnDelete.Margin = new System.Windows.Forms.Padding(4);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(116, 28);
+            this.btnDelete.Size = new System.Drawing.Size(160, 28);
             this.btnDelete.TabIndex = 0;
-            this.btnDelete.Text = "Delete...";
+            this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(5, 4);
+            this.btnAdd.Location = new System.Drawing.Point(37, 37);
             this.btnAdd.Margin = new System.Windows.Forms.Padding(4);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(116, 28);
+            this.btnAdd.Size = new System.Drawing.Size(160, 28);
             this.btnAdd.TabIndex = 0;
-            this.btnAdd.Text = "Add...";
+            this.btnAdd.Text = "Overwrite Audio Files";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
@@ -563,7 +570,7 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtLog.Size = new System.Drawing.Size(1193, 524);
+            this.txtLog.Size = new System.Drawing.Size(1238, 556);
             this.txtLog.TabIndex = 1;
             this.txtLog.Visible = false;
             // 
@@ -644,11 +651,57 @@
             this.sendDiagnosticsReportToolStripMenuItem.Text = "Send diagnostics report";
             this.sendDiagnosticsReportToolStripMenuItem.Click += new System.EventHandler(this.sendDiagnosticsReportToolStripMenuItem_Click);
             // 
+            // toniePropertiesPanel
+            // 
+            this.toniePropertiesPanel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toniePropertiesPanel.Controls.Add(this.TonieProperties_UIDTextBox);
+            this.toniePropertiesPanel.Controls.Add(this.TonieProperties_NameTextBox);
+            this.toniePropertiesPanel.Controls.Add(this.tonieProperties_UIDLabel);
+            this.toniePropertiesPanel.Controls.Add(this.tonieProperties_NameLabel);
+            this.toniePropertiesPanel.Location = new System.Drawing.Point(6, 144);
+            this.toniePropertiesPanel.Name = "toniePropertiesPanel";
+            this.toniePropertiesPanel.Size = new System.Drawing.Size(200, 380);
+            this.toniePropertiesPanel.TabIndex = 2;
+            // 
+            // tonieProperties_NameLabel
+            // 
+            this.tonieProperties_NameLabel.AutoSize = true;
+            this.tonieProperties_NameLabel.Location = new System.Drawing.Point(4, 15);
+            this.tonieProperties_NameLabel.Name = "tonieProperties_NameLabel";
+            this.tonieProperties_NameLabel.Size = new System.Drawing.Size(45, 17);
+            this.tonieProperties_NameLabel.TabIndex = 0;
+            this.tonieProperties_NameLabel.Text = "Name";
+            // 
+            // tonieProperties_UIDLabel
+            // 
+            this.tonieProperties_UIDLabel.AutoSize = true;
+            this.tonieProperties_UIDLabel.Location = new System.Drawing.Point(7, 49);
+            this.tonieProperties_UIDLabel.Name = "tonieProperties_UIDLabel";
+            this.tonieProperties_UIDLabel.Size = new System.Drawing.Size(31, 17);
+            this.tonieProperties_UIDLabel.TabIndex = 1;
+            this.tonieProperties_UIDLabel.Text = "UID";
+            // 
+            // TonieProperties_NameTextBox
+            // 
+            this.TonieProperties_NameTextBox.Location = new System.Drawing.Point(55, 12);
+            this.TonieProperties_NameTextBox.Name = "TonieProperties_NameTextBox";
+            this.TonieProperties_NameTextBox.Size = new System.Drawing.Size(136, 22);
+            this.TonieProperties_NameTextBox.TabIndex = 2;
+            // 
+            // TonieProperties_UIDTextBox
+            // 
+            this.TonieProperties_UIDTextBox.Location = new System.Drawing.Point(55, 46);
+            this.TonieProperties_UIDTextBox.MaxLength = 16;
+            this.TonieProperties_UIDTextBox.Name = "TonieProperties_UIDTextBox";
+            this.TonieProperties_UIDTextBox.ReadOnly = true;
+            this.TonieProperties_UIDTextBox.Size = new System.Drawing.Size(136, 22);
+            this.TonieProperties_UIDTextBox.TabIndex = 3;
+            // 
             // TeddyMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1193, 554);
+            this.ClientSize = new System.Drawing.Size(1238, 586);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.LoadLocalDirectoryButton);
             this.Controls.Add(this.statusStrip1);
@@ -676,6 +729,8 @@
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.TonieContextMenu.ResumeLayout(false);
+            this.toniePropertiesPanel.ResumeLayout(false);
+            this.toniePropertiesPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -737,6 +792,11 @@
         private System.Windows.Forms.ToolStripMenuItem downloadToniesjsonNowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem promptForAudioIDOnAddToolStripMenuItem;
         private System.Windows.Forms.Button LoadLocalDirectoryButton;
+        private System.Windows.Forms.Panel toniePropertiesPanel;
+        private System.Windows.Forms.TextBox TonieProperties_UIDTextBox;
+        private System.Windows.Forms.TextBox TonieProperties_NameTextBox;
+        private System.Windows.Forms.Label tonieProperties_UIDLabel;
+        private System.Windows.Forms.Label tonieProperties_NameLabel;
     }
 }
 

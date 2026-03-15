@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text;
 using System.Windows.Forms;
-using static TeddyBench.TeddyMain;
+using static CaraBosca.GUI.GUIMain;
 
-namespace TeddyBench
+namespace CaraBosca
 {
     static class Program
     {
-        public static TeddyMain MainClass;
+        public static GUI.GUIMain MainClass;
 
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
@@ -22,7 +22,7 @@ namespace TeddyBench
             Application.ThreadException += Application_ThreadException;
             
 
-            MainClass = new TeddyMain();
+            MainClass = new GUI.GUIMain();
             Application.Run(MainClass);
         }
 

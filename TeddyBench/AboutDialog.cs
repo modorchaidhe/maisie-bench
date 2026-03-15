@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace TeddyBench
+namespace CaraBosca.GUI
 {
     public partial class AboutDialog : Form
     {
@@ -22,6 +22,11 @@ namespace TeddyBench
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("https://t.me/toniebox_reverse_engineering");
+        }
+
+        private void AboutDialog_Load(object sender, System.EventArgs e)
+        {
+
         }
     }
 }

@@ -3,7 +3,7 @@ using NAudio.Wave;
 using System;
 using System.IO;
 
-namespace TonieFile
+namespace CaraBosca.Core
 {
     public class OpusWaveStream : WaveStream
     {

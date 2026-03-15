@@ -5,7 +5,7 @@ using System.Linq;
 using System.Media;
 using System.Windows.Forms;
 
-namespace TeddyBench
+namespace CaraBosca.GUI
 {
     public partial class AskUIDForm : Form
     {

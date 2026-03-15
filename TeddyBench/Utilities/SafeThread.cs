@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace TeddyBench
+namespace CaraBosca
 {
     internal class SafeThread
     {

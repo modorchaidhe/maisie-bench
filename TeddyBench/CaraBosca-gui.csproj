@@ -19,10 +19,11 @@
     <ApplicationIcon>dog.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>TeddyBench.Program</StartupObject>
+    <StartupObject>CaraBosca.Program</StartupObject>
     <DebugType>embedded</DebugType>
     <AutoGenerateBindingRedirects>False</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <RootNamespace>CaraBosca.GUI</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28Release settings%29|AnyCPU'">
     <OutputPath>bin\Debug %28Release settings%29\</OutputPath>
@@ -34,7 +35,7 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TonieAudio\TonieAudio.csproj" />
+    <ProjectReference Include="..\TonieAudio\CaraBosca-core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="dog.ico" />

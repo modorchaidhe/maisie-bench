@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace TeddyBench
+namespace CaraBosca
 {
     public class Pn5180Esp : RfidReaderBase
     {

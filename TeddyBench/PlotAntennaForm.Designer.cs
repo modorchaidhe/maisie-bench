@@ -1,4 +1,4 @@
-﻿namespace TeddyBench
+﻿namespace CaraBosca.GUI
 {
     partial class PlotAntennaForm
     {

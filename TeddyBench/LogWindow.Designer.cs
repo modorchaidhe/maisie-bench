@@ -1,4 +1,4 @@
-﻿namespace TeddyBench
+﻿namespace CaraBosca
 {
     partial class LogWindow
     {

@@ -1,5 +1,5 @@
 ﻿
-namespace TeddyBench
+namespace CaraBosca.GUI
 {
     partial class UpdateNotifyDialog
     {

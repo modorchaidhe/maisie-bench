@@ -27,7 +27,7 @@
 #endregion
 
 
-namespace TonieFile
+namespace CaraBosca.Core
 {
     /// <summary>
     /// Defines a class that represents a resizable circular byte queue.

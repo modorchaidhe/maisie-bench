@@ -9,9 +9,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using static TeddyBench.Proxmark3;
+using static CaraBosca.Proxmark3;
 
-namespace TeddyBench
+
+namespace CaraBosca
 {
     public class Proxmark3 : RfidReaderBase
     {
@@ -895,8 +896,6 @@ namespace TeddyBench
                     LogWindow.Log(LogWindow.eLogLevel.Debug, "[PM3] Emulate: Unhandled: " + response.Cmd);
                     return true;
             }
-
-            return false;
         }
 
         public enum eDbprintfFlags

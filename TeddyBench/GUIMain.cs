@@ -21,13 +21,13 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using TeddyBench.Properties;
-using TonieFile;
+using CaraBosca.Properties;
+using CaraBosca.Core;
 using Application = System.Windows.Forms.Application;
 
-namespace TeddyBench
+namespace CaraBosca.GUI
 {
-    public partial class TeddyMain : Form
+    public partial class GUIMain : Form
     {
         private SafeThread ScanCardThread = null;
         private bool ScanCardThreadStop = false;
@@ -255,7 +255,7 @@ namespace TeddyBench
             }
         }
 
-        public TeddyMain()
+        public GUIMain()
         {
             InitializeComponent();
             Log = new LogWindow();
@@ -1334,10 +1334,10 @@ namespace TeddyBench
 
         public class EncodeCallback : TonieAudio.EncodeCallback
         {
-            private readonly TeddyMain Main;
+            private readonly GUIMain Main;
             private int LastPct = 0;
 
-            public EncodeCallback(TeddyMain main)
+            public EncodeCallback(GUIMain main)
             {
                 Main = main;
             }

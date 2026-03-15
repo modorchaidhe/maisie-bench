@@ -15,9 +15,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Teddy.Program</StartupObject>
+    <StartupObject>CaraBosca.CLI.Program</StartupObject>
     <DebugType>embedded</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <RootNamespace>CaraBosca.CLI</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28Release Settings%29|AnyCPU'">
     <OutputPath>bin\Debug %28Release Settings%29\</OutputPath>
@@ -40,7 +41,7 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TonieAudio\TonieAudio.csproj" />
+    <ProjectReference Include="..\TonieAudio\CaraBosca-core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GitInfo" Version="2.2.0" />

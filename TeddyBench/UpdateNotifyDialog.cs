@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
-namespace TeddyBench
+namespace CaraBosca.GUI
 {
     public partial class UpdateNotifyDialog : Form
     {

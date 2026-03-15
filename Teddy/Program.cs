@@ -39,9 +39,9 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using TonieFile;
+using CaraBosca.Core;
 
-namespace Teddy
+namespace CaraBosca.CLI
 {
     class Program
     {

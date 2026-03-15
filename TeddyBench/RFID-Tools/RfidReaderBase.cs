@@ -4,9 +4,9 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static TeddyBench.Proxmark3;
+using static CaraBosca.Proxmark3;
 
-namespace TeddyBench
+namespace CaraBosca
 {
     public abstract class RfidReaderBase
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TeddyBench.Properties {
+namespace CaraBosca.Properties {
     using System;
     
     
